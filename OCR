@@ -1,0 +1,33 @@
+import cv2
+import pytesseract
+
+# Connects pytesseract(wrapper) to the trained tesseract module
+pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+
+# Image filename (change this to use a different image)
+image_filename = 'testocr.png'  # Replace with your image file
+
+# Read the image
+img = cv2.imread(image_filename)
+
+# Obtain the height and width for the image
+hImg, wImg, _ = img.shape
+print(img.shape)
+
+# Convert the image into bounding box values for words
+data = pytesseract.image_to_data(img)
+
+# Draw bounding boxes for words in the image
+for i, b in enumerate(data.splitlines()):
+    if i == 0:
+        continue
+    b = b.split()
+    if len(b) == 12:
+        x, y, w, h = int(b[6]), int(b[7]), int(b[8]), int(b[9])
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 1)
+        cv2.putText(img, b[11], (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+# Output the bounding box with the image
+cv2.imshow('Image Output', img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
